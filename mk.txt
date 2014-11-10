@@ -1,1 +1,0 @@
-g++ -o test main.cpp shader_manager.cpp -lglfw3 -lglew -framework Cocoa -framework OpenGL -framework CoreVideo -framework IOKit -std=c++0x
