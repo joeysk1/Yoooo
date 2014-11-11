@@ -1,9 +1,3 @@
-#include <cmath>
-#include "vector.h"
-
-#ifndef __MATRIX_H
-#define __MATRIX_H
-
 class mat2
 {
 public:
@@ -57,7 +51,6 @@ public:
 
 	mat4();
 	mat4(float* source);
-	mat4(vec4 x, vec4 y, vec4 z, vec4 w);
 
 	//mat4	operator+(mat4& b);
 	//mat4&	operator+=(mat4& b);
@@ -70,5 +63,3 @@ public:
 
 	friend mat4 operator*(float a, mat4 b);
 };
-
-#endif

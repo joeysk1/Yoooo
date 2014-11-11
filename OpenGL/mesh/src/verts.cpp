@@ -1,4 +1,3 @@
-#include <cstdlib>
 #include "../include/verts.h"
 
 //constructors and destructor
@@ -10,7 +9,7 @@ verts::verts()
 
 verts::verts(int c, float* source)
 {
-	data = (float*)malloc(sizeof(float) * c);
+	data = new float[c];
 	for (int i = 0; i < c; i++)
 		data[i] = source[i];
 	count = c;
@@ -19,14 +18,14 @@ verts::verts(int c, float* source)
 verts::~verts()
 {
 	if (data != NULL)
-		free(data);
+		delete[] data;
 }
 
 //data operation method
 void verts::set_data(int c, float* source)
 {
 	if (data != NULL)
-		free(data);
+		delete[] data;
 	data = new float[c];
 	for (int i = 0; i < c; i++)
 		data[i] = source[i];
@@ -37,7 +36,7 @@ void verts::free_data()
 {
 	if (data != NULL)
 	{
-		free(data);
+		delete[] data;
 		data = NULL;
 		count = 0;
 	}

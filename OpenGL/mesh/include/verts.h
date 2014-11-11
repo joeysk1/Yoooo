@@ -13,7 +13,6 @@ public:
 
 	//data operation method
 	void	set_data(int c, float* source);
-	//void	append_data(int c, float* source);
 	void	free_data();
 
 	//geometry generate method

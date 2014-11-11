@@ -208,29 +208,6 @@ mat4::mat4(float* source)
 	memcpy(data, source, 4 * anum);
 }
 
-mat4::mat4(vec4 vx, vec4 vy, vec4 vz, vec4 vw)
-{
-	data[0] = vx.x;
-	data[1] = vx.y;
-	data[2] = vx.z;
-	data[3] = vx.w;
-
-	data[4] = vy.x;
-	data[5] = vy.y;
-	data[6] = vy.z;
-	data[7] = vy.w;
-
-	data[8] = vz.x;
-	data[9] = vz.y;
-	data[10] = vz.z;
-	data[11] = vz.w;
-
-	data[12] = vw.x;
-	data[13] = vw.y;
-	data[14] = vw.z;
-	data[15] = vw.w;
-}
-
 mat4 mat4::operator*(mat4& b)
 {
 	mat4 tmp;

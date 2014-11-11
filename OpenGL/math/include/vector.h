@@ -1,6 +1,3 @@
-#ifndef __VECTOR_H
-#define __VECTOR_H
-
 class vec2
 {
 public:
@@ -70,5 +67,3 @@ public:
 	
 	friend vec4	operator*(float a, vec4& b);
 };
-
-#endif
