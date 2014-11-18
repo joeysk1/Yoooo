@@ -25,12 +25,14 @@ class FoldOperator(bpy.types.Operator):
             bpy.data.meshes[self.obj.name].update()
 
         elif event.type == 'LEFTMOUSE':
+            bpy.data.meshes[self.obj.name].update()
             return {'FINISHED'}
 
         elif event.type in {'RIGHTMOUSE', 'ESC'}:
             #context.object.location.x = self.first_value
             for i in range(len(self.first_pos)):
                 self.vert_sel[i].co = self.first_pos[i]
+            bpy.data.meshes[self.obj.name].update()
             return {'CANCELLED'}
 
         return {'RUNNING_MODAL'}
@@ -64,7 +66,30 @@ class FoldOperator(bpy.types.Operator):
         deltay = self.first_mouse_y - event.mouse_y
         for i in range(len(self.vert_sel)):
         #for vert in self.vert_sel:
-            self.vert_sel[i].co = self.first_pos[i] + mathutils.Vector((deltax * 0.001, deltay * 0.001, 0.0))
+            self.vert_sel[i].co = self.first_pos[i] + mathutils.Vector((deltax * 0.01, deltay * 0.01, 0.0))
+    
+    def sel_line_from_vert(vert):
+        #verts = [vert]
+        v1 = vert
+        while len(v1.link_edges) == 4:
+            ledge = v1.link_edges[0]
+            if v1 == ledge.verts[0]:
+                v1 = ledge,verts[1]
+            else:
+                v1 = ledge.verts[0]   
+            if v1.select:
+                break
+            v1.select = True
+        v1 = vert
+        while len(v1.link_edges) == 4:
+            ledge = v1.link_edges[3]
+            if v1 == ledge.verts[0]:
+                v1 = ledge.verts[1]
+            else:
+                v1 = ledgge.verts[0]
+            if v1.select:
+                break
+            v1.select = True
 
 
 def register():
@@ -80,4 +105,7 @@ if __name__ == "__main__":
 
     # test call
     bpy.ops.object.fold_operator('INVOKE_DEFAULT')
+
+
+
 
