@@ -19,7 +19,7 @@ class ModalSelectOperator(bpy.types.Operator):
         dest_e = None
         
         if event.type == 'MOUSEMOVE':
-            mouse_pos = mathutils.Vector(event.mouse_region_x, event.mouse_region_y)
+            mouse_pos = mathutils.Vector((event.mouse_region_x, event.mouse_region_y))
             for e in self.edges:
                 v1 = e.verts[0]
                 v2 = e.verts[1]
@@ -29,7 +29,7 @@ class ModalSelectOperator(bpy.types.Operator):
                 screen_v2 = view3d_utils.location_3d_to_region_2d(region, region_3d, world_v2)
                 dir = mathutils.Vector(screen_v1 - screen_v2)
                 pdist = mathutils.Vector(mouse_pos - screen_v1)
-                dist = pdist.cross(dir).length() / dir.length()
+                dist = pdist.cross(dir) / dir.length
                 if dist < min_dist:
                     min_dist = dist
                     dest_e = e
@@ -37,11 +37,11 @@ class ModalSelectOperator(bpy.types.Operator):
                     
             if found:
                 #handle the loop sel here
-                e_set = {}
-                e_set = walker(self.edge, 0, e_set, dest_e)
+                e_set = set()
+                walker(self.edge, 0, e_set, dest_e)
                 for e in e_set:
                     e.select = True
-            context.object.update()
+            bpy.data.meshes[context.object.name].update()
 
         elif event.type == 'LEFTMOUSE':
             bpy.data.meshes[context.object.name].update()
@@ -116,6 +116,7 @@ def unregister():
 
 if __name__ == "__main__":
     register()
-
+    #unregister()
     # test call
-    bpy.ops.object.modal_select_operator('INVOKE_DEFAULT')
+    #bpy.ops.object.modal_select_operator('INVOKE_DEFAULT')
+
