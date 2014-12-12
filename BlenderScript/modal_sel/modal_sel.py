@@ -20,25 +20,31 @@ class ModalSelectOperator(bpy.types.Operator):
         
         if event.type == 'MOUSEMOVE':
             mouse_pos = mathutils.Vector((event.mouse_region_x, event.mouse_region_y))
-            for e in self.edges:
-                v1 = e.verts[0]
-                v2 = e.verts[1]
-                world_v1 = ob.matrix_world * v1.co.copy()
-                world_v2 = ob.matrix_world * v2.co.copy()
-                screen_v1 = view3d_utils.location_3d_to_region_2d(region, region_3d, world_v1)
-                screen_v2 = view3d_utils.location_3d_to_region_2d(region, region_3d, world_v2)
-                dir = mathutils.Vector(screen_v1 - screen_v2)
-                pdist = mathutils.Vector(mouse_pos - screen_v1)
-                dist = pdist.cross(dir) / dir.length
-                if dist < min_dist:
-                    min_dist = dist
-                    dest_e = e
-                    found = True
+            print(mouse_pos)
+            for elist in self.edges:
+                for e in elist:
+                    v1 = e.verts[0]
+                    v2 = e.verts[1]
+                    world_v1 = ob.matrix_world * v1.co.copy()
+                    world_v2 = ob.matrix_world * v2.co.copy()
+                    screen_v1 = view3d_utils.location_3d_to_region_2d(region, region_3d, world_v1)
+                    screen_v2 = view3d_utils.location_3d_to_region_2d(region, region_3d, world_v2)
+                    dir = mathutils.Vector(screen_v1 - screen_v2)
+                    pdist = mathutils.Vector(mouse_pos - screen_v1)
+                    dist = pdist.cross(dir) / dir.length
+                    if dist < min_dist:
+                        min_dist = dist
+                        dest_e = e
+                        found = True
                     
             if found:
                 #handle the loop sel here
-                e_set = set()
-                walker(self.edge, 0, e_set, dest_e)
+                for elist in self.edges:
+                    for e in elist:
+                        e.select = False
+                e_set = []
+                loop_dir = self.get_loop_dir(self.is_loop, dest_e)
+                walker(self.edge, loop_dir, e_set, dest_e)
                 for e in e_set:
                     e.select = True
             bpy.data.meshes[context.object.name].update()
@@ -62,11 +68,21 @@ class ModalSelectOperator(bpy.types.Operator):
                 self.report({'WARNING'}, "More than one edge selected, not support yet")
             self.edge = edge[0]
             self.edges, self.is_loop = get_loop_edges(self.edge)
+            self.un_edges = [[], []]
+            self.default_dir = 0
             context.window_manager.modal_handler_add(self)
             return {'RUNNING_MODAL'}
         else:
             self.report({'WARNING'}, "No active object, could not finish")
             return {'CANCELLED'}
+        
+    def get_loop_dir(self, is_loop, dest_e):
+        if is_loop:
+            return self.default_dir
+        if dest_e in self.edges[0]:
+            return 1
+        else:
+            return 0
     
     @classmethod
     def poll(cls, context):
@@ -76,13 +92,14 @@ class ModalSelectOperator(bpy.types.Operator):
     
 #util funcs
 def get_loop_edges(e):
-    e_set = set()
-    is_loop = walker(e, 0, e_set)
+    e_set1 = []
+    e_set2 = []
+    is_loop = walker(e, 0, e_set1)
     if is_loop:
-        return e_set, is_loop
+        return [e_set1], is_loop
     else:
-        walker(e, 1, e_set) 
-    return list(e_set), is_loop       
+        walker(e, 1, e_set2) 
+    return [e_set1, e_set2], is_loop    
         
 def walker(e, dir, s, end=None):
     l = e.link_loops[dir]
@@ -99,8 +116,9 @@ def walker(e, dir, s, end=None):
             is_loop = True
             break
         else:
-            s.add(edge)
-        if end and edge == end:
+            s.append(edge)
+        if end and edge.index == end.index:
+            print('reach end')
             break
         
     return is_loop
